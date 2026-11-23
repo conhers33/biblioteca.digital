@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca digital para estudiantes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-night: #08101e;
+      --bg-surface: #0f1b2e;
+      --bg-surface-hover: #15243d;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-yellow: rgba(244, 196, 48, 0.35);
+      --yellow: #f4c430;
+      --yellow-soft: rgba(244, 196, 48, 0.12);
+      --text-main: #eef2f7;
+      --text-muted: #93a3b8;
+      --text-dim: #64748b;
+      --danger: #f87171;
+      --radius: 12px;
+      --transition: 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-night);
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(244, 196, 48, 0.04) 0%, transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(30, 58, 138, 0.14) 0%, transparent 45%);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+    header { padding: 56px 0 36px; border-bottom: 1px solid var(--border-subtle); }
+
+    .dev-badge {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--yellow-soft);
+      border: 1px solid var(--border-yellow);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: var(--yellow);
+      margin-bottom: 24px;
+    }
+    .dev-badge.active { display: inline-flex; }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+    .hero h1 span { color: var(--yellow); font-style: italic; }
+    .hero p { color: var(--text-muted); font-size: 1.08rem; font-weight: 300; letter-spacing: 0.02em; }
+
+    .search-wrapper { margin-top: 28px; }
+    .search-box { position: relative; width: 100%; max-width: 440px; }
+    .search-box input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 12px 16px 12px 42px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .search-box input:focus { border-color: var(--yellow); }
+    .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all var(--transition);
+    }
+    .btn-primary { background: var(--yellow); color: var(--bg-night); }
+    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-outline { background: transparent; border-color: var(--border-subtle); color: var(--text-main); }
+    .btn-outline:hover { border-color: var(--yellow); color: var(--yellow); }
+    .btn-ghost-danger {
+      background: transparent;
+      color: var(--danger);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(248, 113, 113, 0.25);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-ghost-danger:hover { background: rgba(248, 113, 113, 0.1); }
+
+    main { flex: 1; padding: 44px 0 72px; }
+    .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 28px; }
+
+    .book-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition), border-color var(--transition), background-color var(--transition);
+    }
+    .book-card:hover { transform: translateY(-4px); border-color: rgba(244, 196, 48, 0.3); background: var(--bg-surface-hover); }
+
+    .book-cover {
+      height: 210px;
+      background: linear-gradient(145deg, #0b1628 0%, #132542 100%);
+      position: relative;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .book-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.92; }
+    .book-cover-overlay { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+    .cover-line { width: 32px; height: 2px; background-color: var(--yellow); opacity: 0.85; }
+    .cover-typo-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.6rem; line-height: 1.15; color: var(--text-main); }
+
+    .book-body { padding: 20px; display: flex; flex-direction: column; flex: 1; gap: 10px; }
+    .book-title { font-size: 1.05rem; font-weight: 500; color: var(--text-main); cursor: pointer; }
+    .book-author { font-size: 0.85rem; color: var(--text-muted); }
+    .book-rating-row { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: var(--text-muted); margin-top: 2px; }
+    .stars-display { color: var(--yellow); letter-spacing: 2px; font-size: 0.95rem; }
+    .book-desc { font-size: 0.86rem; color: var(--text-dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px; }
+
+    .book-actions { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle); display: flex; gap: 8px; align-items: center; }
+    .book-actions .btn { flex: 1; padding: 8px 12px; font-size: 0.82rem; }
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 64px 20px; color: var(--text-muted); border: 1px dashed var(--border-subtle); border-radius: var(--radius); }
+
+    footer { border-top: 1px solid var(--border-subtle); padding: 28px 0; font-size: 0.84rem; color: var(--text-dim); }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .dev-link {
+      background: none; border: none; color: var(--text-muted); font-family: inherit; font-size: 0.84rem;
+      cursor: pointer; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(244, 196, 48, 0.35);
+      transition: color var(--transition);
+    }
+    .dev-link:hover { color: var(--yellow); }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(4, 8, 16, 0.82); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
+      width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    }
+    .modal-sm { max-width: 420px; }
+    .modal-close {
+      position: absolute; top: 18px; right: 18px; background: transparent; border: 1px solid var(--border-subtle);
+      color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center; transition: all var(--transition);
+    }
+    .modal-close:hover { border-color: var(--yellow); color: var(--yellow); }
+    .modal h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.9rem; font-weight: 500; margin-bottom: 6px; padding-right: 36px; }
+    .modal-meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px; }
+    .modal-desc { color: var(--text-main); font-size: 0.95rem; margin-bottom: 22px; font-weight: 300; }
+
+    .divider { height: 1px; background: var(--border-subtle); margin: 26px 0; }
+    .section-subtitle { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--yellow); margin-bottom: 14px; }
+
+    .star-picker { display: inline-flex; gap: 6px; margin-bottom: 14px; }
+    .star-btn { background: none; border: none; font-size: 1.6rem; color: var(--text-dim); cursor: pointer; transition: transform 0.15s ease, color 0.15s ease; padding: 0 2px; }
+    .star-btn.filled, .star-btn:hover { color: var(--yellow); transform: scale(1.1); }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.84rem; color: var(--text-muted); margin-bottom: 6px; }
+    .form-control {
+      width: 100%; background: var(--bg-night); border: 1px solid var(--border-subtle); color: var(--text-main);
+      padding: 10px 13px; border-radius: 8px; font-family: inherit; font-size: 0.9rem; outline: none; transition: border-color var(--transition);
+    }
+    .form-control:focus { border-color: var(--yellow); }
+    textarea.form-control { min-height: 84px; resize: vertical; }
+
+    .comments-list { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+    .comment-item { background: var(--bg-night); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px 16px; }
+    .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.84rem; }
+    .comment-author { font-weight: 500; color: var(--text-main); }
+    .comment-stars { color: var(--yellow); letter-spacing: 1px; }
+    .comment-text { font-size: 0.9rem; color: var(--text-muted); }
+    .comment-date { font-size: 0.75rem; color: var(--text-dim); margin-top: 6px; }
+    .error-msg { color: var(--danger); font-size: 0.84rem; margin-top: 8px; }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; background: var(--bg-surface); border: 1px solid var(--yellow);
+      color: var(--text-main); padding: 12px 18px; border-radius: 10px; font-size: 0.88rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); transform: translateY(20px); opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 200;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div id="devBadge" class="dev-badge">
+        <span>Modo Desarrollador</span>
+        <button class="btn btn-primary" style="padding: 5px 12px; font-size: 0.8rem;" onclick="openAddBookModal()">+ Agregar libro</button>
+        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;" onclick="logoutDev()">Salir</button>
+      </div>
+
+      <div class="hero">
+        <h1>Biblioteca digital <span>para estudiantes</span></h1>
+        <p>Descarga, lee, califica!</p>
+      </div>
+
+      <div class="search-wrapper">
+        <div class="search-box">
+          <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Buscar por título o autor..." oninput="renderBooks()" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="books-grid" id="booksGrid"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>Biblioteca digital para estudiantes · Creada en 2026</div>
+      <div>
+        <button class="dev-link" id="footerDevBtn" onclick="handleDevFooterClick()">Ingresar como desarrollador</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal: Detalle, Calificación y Comentarios -->
+  <div class="modal-backdrop" id="bookModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('bookModal')" aria-label="Cerrar">&times;</button>
+      <div id="bookModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Acceso Desarrollador -->
+  <div class="modal-backdrop" id="devLoginModal">
+    <div class="modal modal-sm">
+      <button class="modal-close" onclick="closeModal('devLoginModal')" aria-label="Cerrar">&times;</button>
+      <h2>Acceso Desarrollador</h2>
+      <p class="modal-meta">Ingresa tu clave para agregar o administrar libros en la biblioteca.</p>
+      <form onsubmit="submitDevLogin(event)">
+        <div class="form-group">
+          <label for="devPasswordInput">Contraseña</label>
+          <input type="password" id="devPasswordInput" class="form-control" placeholder="Clave de acceso" required />
+          <div class="error-msg" id="devLoginError"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar Nuevo Libro -->
+  <div class="modal-backdrop" id="addBookModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('addBookModal')" aria-label="Cerrar">&times;</button>
+      <h2>Agregar nuevo libro</h2>
+      <p class="modal-meta">Sube un nuevo título y su archivo descargable (PDF, EPUB, etc.).</p>
+      <form onsubmit="submitNewBook(event)">
+        <div class="form-group">
+          <label for="newTitle">Título del libro *</label>
+          <input type="text" id="newTitle" class="form-control" required placeholder="Ej: El diseño como actitud" />
+        </div>
+        <div class="form-group">
+          <label for="newAuthor">Autor / Autora *</label>
+          <input type="text" id="newAuthor" class="form-control" required placeholder="Ej: Alice Rawsthorn" />
+        </div>
+        <div class="form-group">
+          <label for="newDesc">Reseña o descripción breve *</label>
+          <textarea id="newDesc" class="form-control" required placeholder="¿De qué trata este libro?"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="newFile">Archivo del libro (PDF, EPUB, ZIP...) *</label>
+          <input type="file" id="newFile" class="form-control" accept=".pdf,.epub,.zip,.txt,.doc,.docx" required />
+        </div>
+        <div class="form-group">
+          <label for="newCover">Portada opcional (imagen JPG o PNG)</label>
+          <input type="file" id="newCover" class="form-control" accept="image/*" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Guardar y publicar libro</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const DEV_PASSWORD = "diseno2026";
+    const STORAGE_KEY = "nocturno_library_books_v1";
+    const DEV_SESSION_KEY = "nocturno_dev_logged_in";
+
+    const DEFAULT_BOOKS = [
+      {
+        id: "book-1",
+        title: "Sistemas de retículas",
+        author: "Josef Müller-Brockmann",
+        description: "Manual clásico sobre el uso constructivo de la retícula para ordenar texto, fotografía e ilustración con claridad y rigor visual.",
+        fileName: "Sistemas_de_reticulas_ficha.txt",
+        isDemo: true,
+        reviews: [
+          { name: "Camila R.", stars: 5, text: "Imprescindible para entender composición editorial desde primer año.", date: "12/11/2026" },
+          { name: "Matías V.", stars: 4, text: "Muy técnico al inicio, pero los ejemplos visuales lo explican todo.", date: "15/11/2026" }
+        ]
+      },
+      {
+        id: "book-2",
+        title: "Los elementos del estilo tipográfico",
+        author: "Robert Bringhurst",
+        description: "Una obra de referencia sobre proporción, ritmo, jerarquía y cuidado en la elección y composición tipográfica.",
+        fileName: "Elementos_estilo_tipografico_ficha.txt",
+        isDemo: true,
+        reviews: [
+          { name: "Sofía L.", stars: 5, text: "Cambia por completo la forma en que uno mira un párrafo.", date: "18/11/2026" }
+        ]
+      },
+      {
+        id: "book-3",
+        title: "La interacción del color",
+        author: "Josef Albers",
+        description: "Investigación práctica sobre cómo percibimos los colores en relación con su entorno y por qué un mismo tono puede parecer distinto.",
+        fileName: "La_interaccion_del_color_ficha.txt",
+        isDemo: true,
+        reviews: [
+          { name: "Lucas M.", stars: 5, text: "Los ejercicios de contraste ayudan muchísimo en paletas digitales.", date: "20/11/2026" }
+        ]
+      },
+      {
+        id: "book-4",
+        title: "No me hagas pensar",
+        author: "Steve Krug",
+        description: "Guía directa y amena sobre usabilidad web, navegación intuitiva y cómo diseñar interfaces sin fricción para las personas.",
+        fileName: "No_me_hagas_pensar_ficha.txt",
+        isDemo: true,
+        reviews: [
+          { name: "Valentina P.", stars: 4, text: "Corto, claro y directo al grano para proyectos de interfaces.", date: "21/11/2026" }
+        ]
+      }
+    ];
+
+    let books = [];
+    let selectedStarRating = 5;
+    let isDev = sessionStorage.getItem(DEV_SESSION_KEY) === "true";
+
+    function openFilesDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("NocturnoFilesDB", 1);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains("files")) {
+            db.createObjectStore("files", { keyPath: "key" });
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function saveFileToDB(key, file) {
+      const db = await openFilesDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("files", "readwrite");
+        tx.objectStore("files").put({ key, blob: file, name: file.name, type: file.type });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function getFileFromDB(key) {
+      const db = await openFilesDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("files", "readonly");
+        const req = tx.objectStore("files").get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function deleteFileFromDB(key) {
+      const db = await openFilesDB();
+      return new Promise((resolve) => {
+        const tx = db.transaction("files", "readwrite");
+        tx.objectStore("files").delete(key);
+        tx.oncomplete = () => resolve();
+      });
+    }
+
+    function loadBooks() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try { books = JSON.parse(saved); } catch { books = structuredClone(DEFAULT_BOOKS); }
+      } else {
+        books = structuredClone(DEFAULT_BOOKS);
+        saveBooks();
+      }
+    }
+
+    function saveBooks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+    }
+
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function getAverageRating(book) {
+      if (!book.reviews || book.reviews.length === 0) return 0;
+      return book.reviews.reduce((acc, r) => acc + r.stars, 0) / book.reviews.length;
+    }
+
+    function renderStarsString(avg) {
+      const rounded = Math.round(avg);
+      return "★".repeat(rounded) + "☆".repeat(5 - rounded);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    async function renderBooks() {
+      const grid = document.getElementById("booksGrid");
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      const filtered = books.filter(b =>
+        b.title.toLowerCase().includes(query) ||
+        b.author.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">No se encontraron libros con ese criterio.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(book => {
+        const avg = getAverageRating(book);
+        const count = book.reviews ? book.reviews.length : 0;
+        const ratingText = count > 0 ? `${avg.toFixed(1)} (${count})` : "Sin reseñas";
+
+        return `
+          <article class="book-card">
+            <div class="book-cover" onclick="openBookModal('${book.id}')" id="cover-${book.id}">
+              <div class="book-cover-overlay">
+                <div class="cover-line"></div>
+                <div class="cover-typo-title">${escapeHTML(book.title)}</div>
+              </div>
+            </div>
+            <div class="book-body">
+              <div class="book-title" onclick="openBookModal('${book.id}')">${escapeHTML(book.title)}</div>
+              <div class="book-author">${escapeHTML(book.author)}</div>
+              <div class="book-rating-row">
+                <span class="stars-display">${renderStarsString(avg)}</span>
+                <span>${ratingText}</span>
+              </div>
+              <p class="book-desc">${escapeHTML(book.description)}</p>
+              <div class="book-actions">
+                <button class="btn btn-outline" onclick="openBookModal('${book.id}')">Comentar</button>
+                <button class="btn btn-primary" onclick="downloadBook('${book.id}')">Descargar</button>
+                ${isDev ? `<button class="btn-ghost-danger" onclick="deleteBook('${book.id}')" title="Eliminar libro">✕</button>` : ""}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      for (const book of filtered) {
+        if (book.hasCover) {
+          const coverRecord = await getFileFromDB(`cover_${book.id}`);
+          if (coverRecord && coverRecord.blob) {
+            const url = URL.createObjectURL(coverRecord.blob);
+            const coverEl = document.getElementById(`cover-${book.id}`);
+            if (coverEl) {
+              const img = document.createElement("img");
+              img.src = url;
+              img.alt = book.title;
+              coverEl.prepend(img);
+              const overlay = coverEl.querySelector(".book-cover-overlay");
+              if (overlay) overlay.style.display = "none";
+            }
+          }
+        }
+      }
+    }
+
+    function openBookModal(bookId) {
+      const book = books.find(b => b.id === bookId);
+      if (!book) return;
+
+      selectedStarRating = 5;
+      const avg = getAverageRating(book);
+      const count = book.reviews ? book.reviews.length : 0;
+
+      const reviewsHTML = (book.reviews && book.reviews.length > 0)
+        ? book.reviews.slice().reverse().map(r => `
+            <div class="comment-item">
+              <div class="comment-header">
+                <span class="comment-author">${escapeHTML(r.name)}</span>
+                <span class="comment-stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</span>
+              </div>
+              <div class="comment-text">${escapeHTML(r.text)}</div>
+              <div class="comment-date">${escapeHTML(r.date)}</div>
+            </div>
+          `).join("")
+        : `<p style="color: var(--text-dim); font-size: 0.88rem;">Aún no hay comentarios. Sé el primero en opinar sobre este libro.</p>`;
+
+      document.getElementById("bookModalContent").innerHTML = `
+        <h2>${escapeHTML(book.title)}</h2>
+        <div class="modal-meta">
+          Por ${escapeHTML(book.author)} ·
+          <span style="color: var(--yellow);">${renderStarsString(avg)}</span>
+          (${count > 0 ? avg.toFixed(1) + " / 5" : "Sin calificaciones"})
+        </div>
+        <p class="modal-desc">${escapeHTML(book.description)}</p>
+
+        <button class="btn btn-primary" onclick="downloadBook('${book.id}')">
+          Descargar archivo (${escapeHTML(book.fileName || "Libro")})
+        </button>
+
+        <div class="divider"></div>
+
+        <div class="section-subtitle">Calificar y comentar</div>
+        <form onsubmit="submitReview(event, '${book.id}')">
+          <div class="star-picker" id="starPicker">
+            ${[1, 2, 3, 4, 5].map(n => `
+              <button type="button" class="star-btn ${n <= 5 ? "filled" : ""}" onclick="setRating(${n})" aria-label="${n} estrellas">★</button>
+            `).join("")}
+          </div>
+          <div class="form-group">
+            <label for="reviewerName">Tu nombre</label>
+            <input type="text" id="reviewerName" class="form-control" placeholder="Ej: Antonia G." required />
+          </div>
+          <div class="form-group">
+            <label for="reviewText">Tu comentario</label>
+            <textarea id="reviewText" class="form-control" placeholder="¿Qué te pareció este libro?" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-outline">Publicar reseña</button>
+        </form>
+
+        <div class="divider"></div>
+
+        <div class="section-subtitle">Comentarios de estudiantes (${count})</div>
+        <div class="comments-list">${reviewsHTML}</div>
+      `;
+
+      document.getElementById("bookModal").classList.add("open");
+    }
+
+    function setRating(stars) {
+      selectedStarRating = stars;
+      document.querySelectorAll("#starPicker .star-btn").forEach((btn, idx) => {
+        btn.classList.toggle("filled", idx < stars);
+      });
+    }
+
+    function submitReview(event, bookId) {
+      event.preventDefault();
+      const name = document.getElementById("reviewerName").value.trim();
+      const text = document.getElementById("reviewText").value.trim();
+      if (!name || !text) return;
+
+      const book = books.find(b => b.id === bookId);
+      if (!book) return;
+
+      if (!book.reviews) book.reviews = [];
+      book.reviews.push({
+        name,
+        stars: selectedStarRating,
+        text,
+        date: new Date().toLocaleDateString("es-CL")
+      });
+
+      saveBooks();
+      renderBooks();
+      openBookModal(bookId);
+      showToast("Gracias por tu calificación y comentario.");
+    }
+
+    async function downloadBook(bookId) {
+      const book = books.find(b => b.id === bookId);
+      if (!book) return;
+
+      const stored = await getFileFromDB(`file_${book.id}`);
+      if (stored && stored.blob) {
+        const url = URL.createObjectURL(stored.blob);
+        triggerDownload(url, stored.name || book.fileName);
+        URL.revokeObjectURL(url);
+        showToast(`Descargando "${book.title}"...`);
+        return;
+      }
+
+      if (book.isDemo) {
+        const content = `BIBLIOTECA DIGITAL PARA ESTUDIANTES\n====================================\nTítulo: ${book.title}\nAutor: ${book.author}\n\nResumen:\n${book.description}\n\n(Archivo de demostración. Ingresa como desarrollador para subir tus propios PDF o EPUB).`;
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        triggerDownload(url, book.fileName || "ficha_libro.txt");
+        URL.revokeObjectURL(url);
+        showToast("Descargando ficha de muestra...");
+        return;
+      }
+
+      showToast("No se encontró el archivo en este navegador.");
+    }
+
+    function triggerDownload(url, filename) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function updateDevUI() {
+      document.getElementById("devBadge").classList.toggle("active", isDev);
+      document.getElementById("footerDevBtn").textContent = isDev
+        ? "Panel de desarrollador activo (+ Agregar libro)"
+        : "Ingresar como desarrollador";
+      renderBooks();
+    }
+
+    function handleDevFooterClick() {
+      if (isDev) {
+        openAddBookModal();
+      } else {
+        document.getElementById("devLoginError").textContent = "";
+        document.getElementById("devPasswordInput").value = "";
+        document.getElementById("devLoginModal").classList.add("open");
+      }
+    }
+
+    function submitDevLogin(event) {
+      event.preventDefault();
+      const input = document.getElementById("devPasswordInput").value;
+      if (input === DEV_PASSWORD) {
+        isDev = true;
+        sessionStorage.setItem(DEV_SESSION_KEY, "true");
+        closeModal("devLoginModal");
+        updateDevUI();
+        showToast("Sesión de desarrollador iniciada.");
+      } else {
+        document.getElementById("devLoginError").textContent = "Contraseña incorrecta.";
+      }
+    }
+
+    function logoutDev() {
+      isDev = false;
+      sessionStorage.removeItem(DEV_SESSION_KEY);
+      updateDevUI();
+      showToast("Sesión cerrada.");
+    }
+
+    function openAddBookModal() {
+      document.getElementById("addBookModal").classList.add("open");
+    }
+
+    async function submitNewBook(event) {
+      event.preventDefault();
+      const title = document.getElementById("newTitle").value.trim();
+      const author = document.getElementById("newAuthor").value.trim();
+      const description = document.getElementById("newDesc").value.trim();
+      const fileInput = document.getElementById("newFile");
+      const coverInput = document.getElementById("newCover");
+
+      const bookFile = fileInput.files[0];
+      if (!bookFile) return;
+
+      const id = "book-" + Date.now();
+      await saveFileToDB(`file_${id}`, bookFile);
+
+      let hasCover = false;
+      if (coverInput.files && coverInput.files[0]) {
+        await saveFileToDB(`cover_${id}`, coverInput.files[0]);
+        hasCover = true;
+      }
+
+      books.unshift({
+        id,
+        title,
+        author,
+        description,
+        fileName: bookFile.name,
+        hasCover,
+        isDemo: false,
+        reviews: []
+      });
+
+      saveBooks();
+      event.target.reset();
+      closeModal("addBookModal");
+      renderBooks();
+      showToast(`"${title}" agregado a la biblioteca.`);
+    }
+
+    async function deleteBook(bookId) {
+      if (!confirm("¿Seguro que quieres eliminar este libro de la biblioteca?")) return;
+      books = books.filter(b => b.id !== bookId);
+      await deleteFileFromDB(`file_${bookId}`);
+      await deleteFileFromDB(`cover_${bookId}`);
+      saveBooks();
+      renderBooks();
+      showToast("Libro eliminado.");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+      backdrop.addEventListener("click", (e) => {
+        if (e.target === backdrop) backdrop.classList.remove("open");
+      });
+    });
+
+    loadBooks();
+    updateDevUI();
+  </script>
+</body>
+</html>
