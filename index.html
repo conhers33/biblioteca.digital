@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblioteca digital para estudiantes</title>
+  <title>Biblioteca Digital LERO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
     }
 
     .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
-    header { padding: 56px 0 36px; border-bottom: 1px solid var(--border-subtle); }
+    header { padding: 48px 0 36px; border-bottom: 1px solid var(--border-subtle); }
 
     .dev-badge {
       display: none; align-items: center; gap: 10px; background: var(--yellow-soft);
@@ -50,6 +50,40 @@
       font-size: 0.82rem; color: var(--yellow); margin-bottom: 24px;
     }
     .dev-badge.active { display: inline-flex; }
+
+    .header-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
+    .header-logo {
+      width: 96px;
+      height: 96px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #c7d0eb;
+      border: 2px solid var(--border-yellow);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .header-logo {
+        width: 70px;
+        height: 70px;
+      }
+    }
 
     .hero h1 {
       font-family: 'Cormorant Garamond', Georgia, serif;
@@ -189,9 +223,14 @@
         <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;" onclick="logoutDev()">Salir</button>
       </div>
 
-      <div class="hero">
-        <h1>Biblioteca digital <span>para estudiantes</span></h1>
-        <p>Descarga, lee, califica!</p>
+      <div class="header-main">
+        <div class="hero">
+          <h1>Biblioteca Digital <span>LERO</span></h1>
+          <p>Descarga, lee, califica!</p>
+        </div>
+        <div class="header-logo">
+          <img src="https://phiboxmhuvuwwllsnbak.supabase.co/storage/v1/object/public/libros/logo.jpeg" alt="Logo Biblioteca Digital LERO" />
+        </div>
       </div>
 
       <div class="search-wrapper">
@@ -216,7 +255,7 @@
 
   <footer>
     <div class="container footer-inner">
-      <div>Biblioteca digital para estudiantes · Creada en 2026</div>
+      <div>Biblioteca Digital LERO · Creada en 2026</div>
       <div>
         <button class="dev-link" id="footerDevBtn" onclick="handleDevFooterClick()">Ingresar como desarrollador</button>
       </div>
