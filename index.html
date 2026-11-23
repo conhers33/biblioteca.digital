@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg-night: #08101e;
@@ -41,30 +42,19 @@
     }
 
     .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
-
     header { padding: 56px 0 36px; border-bottom: 1px solid var(--border-subtle); }
 
     .dev-badge {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      background: var(--yellow-soft);
-      border: 1px solid var(--border-yellow);
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      color: var(--yellow);
-      margin-bottom: 24px;
+      display: none; align-items: center; gap: 10px; background: var(--yellow-soft);
+      border: 1px solid var(--border-yellow); padding: 6px 12px; border-radius: 999px;
+      font-size: 0.82rem; color: var(--yellow); margin-bottom: 24px;
     }
     .dev-badge.active { display: inline-flex; }
 
     .hero h1 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
-      font-weight: 500;
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      margin-bottom: 12px;
+      font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 500;
+      line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 12px;
     }
     .hero h1 span { color: var(--yellow); font-style: italic; }
     .hero p { color: var(--text-muted); font-size: 1.08rem; font-weight: 300; letter-spacing: 0.02em; }
@@ -72,46 +62,26 @@
     .search-wrapper { margin-top: 28px; }
     .search-box { position: relative; width: 100%; max-width: 440px; }
     .search-box input {
-      width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-main);
-      padding: 12px 16px 12px 42px;
-      border-radius: 999px;
-      font-size: 0.92rem;
-      font-family: inherit;
-      outline: none;
-      transition: border-color var(--transition);
+      width: 100%; background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      color: var(--text-main); padding: 12px 16px 12px 42px; border-radius: 999px;
+      font-size: 0.92rem; font-family: inherit; outline: none; transition: border-color var(--transition);
     }
     .search-box input:focus { border-color: var(--yellow); }
     .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all var(--transition);
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 18px; border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+      font-family: inherit; cursor: pointer; border: 1px solid transparent; transition: all var(--transition);
     }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-primary { background: var(--yellow); color: var(--bg-night); }
-    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
     .btn-outline { background: transparent; border-color: var(--border-subtle); color: var(--text-main); }
-    .btn-outline:hover { border-color: var(--yellow); color: var(--yellow); }
+    .btn-outline:hover:not(:disabled) { border-color: var(--yellow); color: var(--yellow); }
     .btn-ghost-danger {
-      background: transparent;
-      color: var(--danger);
-      padding: 6px 10px;
-      font-size: 0.8rem;
-      border: 1px solid rgba(248, 113, 113, 0.25);
-      border-radius: 6px;
-      cursor: pointer;
+      background: transparent; color: var(--danger); padding: 6px 10px; font-size: 0.8rem;
+      border: 1px solid rgba(248, 113, 113, 0.25); border-radius: 6px; cursor: pointer;
     }
     .btn-ghost-danger:hover { background: rgba(248, 113, 113, 0.1); }
 
@@ -119,27 +89,16 @@
     .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 28px; }
 
     .book-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius);
+      overflow: hidden; display: flex; flex-direction: column;
       transition: transform var(--transition), border-color var(--transition), background-color var(--transition);
     }
     .book-card:hover { transform: translateY(-4px); border-color: rgba(244, 196, 48, 0.3); background: var(--bg-surface-hover); }
 
     .book-cover {
-      height: 210px;
-      background: linear-gradient(145deg, #0b1628 0%, #132542 100%);
-      position: relative;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-subtle);
-      cursor: pointer;
-      overflow: hidden;
+      height: 210px; background: linear-gradient(145deg, #0b1628 0%, #132542 100%);
+      position: relative; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle); cursor: pointer; overflow: hidden;
     }
     .book-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.92; }
     .book-cover-overlay { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
@@ -249,7 +208,9 @@
 
   <main>
     <div class="container">
-      <div class="books-grid" id="booksGrid"></div>
+      <div class="books-grid" id="booksGrid">
+        <div class="empty-state">Cargando biblioteca...</div>
+      </div>
     </div>
   </main>
 
@@ -275,14 +236,18 @@
     <div class="modal modal-sm">
       <button class="modal-close" onclick="closeModal('devLoginModal')" aria-label="Cerrar">&times;</button>
       <h2>Acceso Desarrollador</h2>
-      <p class="modal-meta">Ingresa tu clave para agregar o administrar libros en la biblioteca.</p>
+      <p class="modal-meta">Inicia sesión con tu cuenta de administrador creada en Supabase.</p>
       <form onsubmit="submitDevLogin(event)">
         <div class="form-group">
+          <label for="devEmailInput">Correo</label>
+          <input type="email" id="devEmailInput" class="form-control" placeholder="tu@correo.com" required />
+        </div>
+        <div class="form-group">
           <label for="devPasswordInput">Contraseña</label>
-          <input type="password" id="devPasswordInput" class="form-control" placeholder="Clave de acceso" required />
+          <input type="password" id="devPasswordInput" class="form-control" placeholder="Tu contraseña" required />
           <div class="error-msg" id="devLoginError"></div>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar</button>
+        <button type="submit" id="devLoginBtn" class="btn btn-primary" style="width: 100%;">Ingresar</button>
       </form>
     </div>
   </div>
@@ -292,7 +257,7 @@
     <div class="modal">
       <button class="modal-close" onclick="closeModal('addBookModal')" aria-label="Cerrar">&times;</button>
       <h2>Agregar nuevo libro</h2>
-      <p class="modal-meta">Sube un nuevo título y su archivo descargable (PDF, EPUB, etc.).</p>
+      <p class="modal-meta">Sube un nuevo título y su archivo para que todos puedan descargarlo.</p>
       <form onsubmit="submitNewBook(event)">
         <div class="form-group">
           <label for="newTitle">Título del libro *</label>
@@ -314,7 +279,8 @@
           <label for="newCover">Portada opcional (imagen JPG o PNG)</label>
           <input type="file" id="newCover" class="form-control" accept="image/*" />
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Guardar y publicar libro</button>
+        <div class="error-msg" id="addBookError"></div>
+        <button type="submit" id="addBookBtn" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Guardar y publicar libro</button>
       </form>
     </div>
   </div>
@@ -322,123 +288,25 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const DEV_PASSWORD = "diseno2026";
-    const STORAGE_KEY = "nocturno_library_books_v1";
-    const DEV_SESSION_KEY = "nocturno_dev_logged_in";
+    const SUPABASE_URL = "https://phiboxmhuvuwwllsnbak.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_ORwPyR04S_IAi9OXnh6Caw_7WmwV1h9";
 
-    const DEFAULT_BOOKS = [
-      {
-        id: "book-1",
-        title: "Sistemas de retículas",
-        author: "Josef Müller-Brockmann",
-        description: "Manual clásico sobre el uso constructivo de la retícula para ordenar texto, fotografía e ilustración con claridad y rigor visual.",
-        fileName: "Sistemas_de_reticulas_ficha.txt",
-        isDemo: true,
-        reviews: [
-          { name: "Camila R.", stars: 5, text: "Imprescindible para entender composición editorial desde primer año.", date: "12/11/2026" },
-          { name: "Matías V.", stars: 4, text: "Muy técnico al inicio, pero los ejemplos visuales lo explican todo.", date: "15/11/2026" }
-        ]
-      },
-      {
-        id: "book-2",
-        title: "Los elementos del estilo tipográfico",
-        author: "Robert Bringhurst",
-        description: "Una obra de referencia sobre proporción, ritmo, jerarquía y cuidado en la elección y composición tipográfica.",
-        fileName: "Elementos_estilo_tipografico_ficha.txt",
-        isDemo: true,
-        reviews: [
-          { name: "Sofía L.", stars: 5, text: "Cambia por completo la forma en que uno mira un párrafo.", date: "18/11/2026" }
-        ]
-      },
-      {
-        id: "book-3",
-        title: "La interacción del color",
-        author: "Josef Albers",
-        description: "Investigación práctica sobre cómo percibimos los colores en relación con su entorno y por qué un mismo tono puede parecer distinto.",
-        fileName: "La_interaccion_del_color_ficha.txt",
-        isDemo: true,
-        reviews: [
-          { name: "Lucas M.", stars: 5, text: "Los ejercicios de contraste ayudan muchísimo en paletas digitales.", date: "20/11/2026" }
-        ]
-      },
-      {
-        id: "book-4",
-        title: "No me hagas pensar",
-        author: "Steve Krug",
-        description: "Guía directa y amena sobre usabilidad web, navegación intuitiva y cómo diseñar interfaces sin fricción para las personas.",
-        fileName: "No_me_hagas_pensar_ficha.txt",
-        isDemo: true,
-        reviews: [
-          { name: "Valentina P.", stars: 4, text: "Corto, claro y directo al grano para proyectos de interfaces.", date: "21/11/2026" }
-        ]
-      }
-    ];
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let books = [];
     let selectedStarRating = 5;
-    let isDev = sessionStorage.getItem(DEV_SESSION_KEY) === "true";
-
-    function openFilesDB() {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open("NocturnoFilesDB", 1);
-        request.onupgradeneeded = (e) => {
-          const db = e.target.result;
-          if (!db.objectStoreNames.contains("files")) {
-            db.createObjectStore("files", { keyPath: "key" });
-          }
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    async function saveFileToDB(key, file) {
-      const db = await openFilesDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction("files", "readwrite");
-        tx.objectStore("files").put({ key, blob: file, name: file.name, type: file.type });
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-      });
-    }
-
-    async function getFileFromDB(key) {
-      const db = await openFilesDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction("files", "readonly");
-        const req = tx.objectStore("files").get(key);
-        req.onsuccess = () => resolve(req.result || null);
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    async function deleteFileFromDB(key) {
-      const db = await openFilesDB();
-      return new Promise((resolve) => {
-        const tx = db.transaction("files", "readwrite");
-        tx.objectStore("files").delete(key);
-        tx.oncomplete = () => resolve();
-      });
-    }
-
-    function loadBooks() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try { books = JSON.parse(saved); } catch { books = structuredClone(DEFAULT_BOOKS); }
-      } else {
-        books = structuredClone(DEFAULT_BOOKS);
-        saveBooks();
-      }
-    }
-
-    function saveBooks() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
-    }
+    let isDev = false;
 
     function escapeHTML(str) {
-      return String(str)
+      return String(str || "")
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function sanitizeFileName(name) {
+      return name
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
     }
 
     function getAverageRating(book) {
@@ -455,10 +323,33 @@
       const toast = document.getElementById("toast");
       toast.textContent = msg;
       toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3000);
+      setTimeout(() => toast.classList.remove("show"), 3200);
     }
 
-    async function renderBooks() {
+    async function initApp() {
+      const { data: { session } } = await sb.auth.getSession();
+      isDev = !!session;
+      updateDevUI();
+      await fetchBooks();
+    }
+
+    async function fetchBooks() {
+      const { data, error } = await sb
+        .from("books")
+        .select("*, reviews(*)")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        document.getElementById("booksGrid").innerHTML =
+          `<div class="empty-state">Error al cargar libros: ${escapeHTML(error.message)}</div>`;
+        return;
+      }
+
+      books = data || [];
+      renderBooks();
+    }
+
+    function renderBooks() {
       const grid = document.getElementById("booksGrid");
       const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
@@ -468,7 +359,9 @@
       );
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="empty-state">No se encontraron libros con ese criterio.</div>`;
+        grid.innerHTML = books.length === 0
+          ? `<div class="empty-state">Aún no hay libros publicados. Ingresa como desarrollador al pie de página para subir el primero.</div>`
+          : `<div class="empty-state">No se encontraron libros con ese criterio.</div>`;
         return;
       }
 
@@ -477,14 +370,16 @@
         const count = book.reviews ? book.reviews.length : 0;
         const ratingText = count > 0 ? `${avg.toFixed(1)} (${count})` : "Sin reseñas";
 
+        const coverHTML = book.cover_url
+          ? `<img src="${escapeHTML(book.cover_url)}" alt="${escapeHTML(book.title)}" />`
+          : `<div class="book-cover-overlay">
+               <div class="cover-line"></div>
+               <div class="cover-typo-title">${escapeHTML(book.title)}</div>
+             </div>`;
+
         return `
           <article class="book-card">
-            <div class="book-cover" onclick="openBookModal('${book.id}')" id="cover-${book.id}">
-              <div class="book-cover-overlay">
-                <div class="cover-line"></div>
-                <div class="cover-typo-title">${escapeHTML(book.title)}</div>
-              </div>
-            </div>
+            <div class="book-cover" onclick="openBookModal('${book.id}')">${coverHTML}</div>
             <div class="book-body">
               <div class="book-title" onclick="openBookModal('${book.id}')">${escapeHTML(book.title)}</div>
               <div class="book-author">${escapeHTML(book.author)}</div>
@@ -502,24 +397,6 @@
           </article>
         `;
       }).join("");
-
-      for (const book of filtered) {
-        if (book.hasCover) {
-          const coverRecord = await getFileFromDB(`cover_${book.id}`);
-          if (coverRecord && coverRecord.blob) {
-            const url = URL.createObjectURL(coverRecord.blob);
-            const coverEl = document.getElementById(`cover-${book.id}`);
-            if (coverEl) {
-              const img = document.createElement("img");
-              img.src = url;
-              img.alt = book.title;
-              coverEl.prepend(img);
-              const overlay = coverEl.querySelector(".book-cover-overlay");
-              if (overlay) overlay.style.display = "none";
-            }
-          }
-        }
-      }
     }
 
     function openBookModal(bookId) {
@@ -528,17 +405,20 @@
 
       selectedStarRating = 5;
       const avg = getAverageRating(book);
-      const count = book.reviews ? book.reviews.length : 0;
+      const sortedReviews = (book.reviews || [])
+        .slice()
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      const count = sortedReviews.length;
 
-      const reviewsHTML = (book.reviews && book.reviews.length > 0)
-        ? book.reviews.slice().reverse().map(r => `
+      const reviewsHTML = count > 0
+        ? sortedReviews.map(r => `
             <div class="comment-item">
               <div class="comment-header">
-                <span class="comment-author">${escapeHTML(r.name)}</span>
+                <span class="comment-author">${escapeHTML(r.reviewer_name)}</span>
                 <span class="comment-stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</span>
               </div>
-              <div class="comment-text">${escapeHTML(r.text)}</div>
-              <div class="comment-date">${escapeHTML(r.date)}</div>
+              <div class="comment-text">${escapeHTML(r.comment)}</div>
+              <div class="comment-date">${new Date(r.created_at).toLocaleDateString("es-CL")}</div>
             </div>
           `).join("")
         : `<p style="color: var(--text-dim); font-size: 0.88rem;">Aún no hay comentarios. Sé el primero en opinar sobre este libro.</p>`;
@@ -553,7 +433,7 @@
         <p class="modal-desc">${escapeHTML(book.description)}</p>
 
         <button class="btn btn-primary" onclick="downloadBook('${book.id}')">
-          Descargar archivo (${escapeHTML(book.fileName || "Libro")})
+          Descargar archivo (${escapeHTML(book.file_name || "Libro")})
         </button>
 
         <div class="divider"></div>
@@ -562,7 +442,7 @@
         <form onsubmit="submitReview(event, '${book.id}')">
           <div class="star-picker" id="starPicker">
             ${[1, 2, 3, 4, 5].map(n => `
-              <button type="button" class="star-btn ${n <= 5 ? "filled" : ""}" onclick="setRating(${n})" aria-label="${n} estrellas">★</button>
+              <button type="button" class="star-btn filled" onclick="setRating(${n})" aria-label="${n} estrellas">★</button>
             `).join("")}
           </div>
           <div class="form-group">
@@ -573,7 +453,7 @@
             <label for="reviewText">Tu comentario</label>
             <textarea id="reviewText" class="form-control" placeholder="¿Qué te pareció este libro?" required></textarea>
           </div>
-          <button type="submit" class="btn btn-outline">Publicar reseña</button>
+          <button type="submit" id="reviewSubmitBtn" class="btn btn-outline">Publicar reseña</button>
         </form>
 
         <div class="divider"></div>
@@ -592,62 +472,47 @@
       });
     }
 
-    function submitReview(event, bookId) {
+    async function submitReview(event, bookId) {
       event.preventDefault();
       const name = document.getElementById("reviewerName").value.trim();
       const text = document.getElementById("reviewText").value.trim();
       if (!name || !text) return;
 
-      const book = books.find(b => b.id === bookId);
-      if (!book) return;
+      const btn = document.getElementById("reviewSubmitBtn");
+      btn.disabled = true;
+      btn.textContent = "Publicando...";
 
-      if (!book.reviews) book.reviews = [];
-      book.reviews.push({
-        name,
+      const { error } = await sb.from("reviews").insert({
+        book_id: bookId,
+        reviewer_name: name,
         stars: selectedStarRating,
-        text,
-        date: new Date().toLocaleDateString("es-CL")
+        comment: text
       });
 
-      saveBooks();
-      renderBooks();
+      if (error) {
+        btn.disabled = false;
+        btn.textContent = "Publicar reseña";
+        showToast("No se pudo guardar tu reseña: " + error.message);
+        return;
+      }
+
+      await fetchBooks();
       openBookModal(bookId);
       showToast("Gracias por tu calificación y comentario.");
     }
 
-    async function downloadBook(bookId) {
+    function downloadBook(bookId) {
       const book = books.find(b => b.id === bookId);
-      if (!book) return;
+      if (!book || !book.file_url) return;
 
-      const stored = await getFileFromDB(`file_${book.id}`);
-      if (stored && stored.blob) {
-        const url = URL.createObjectURL(stored.blob);
-        triggerDownload(url, stored.name || book.fileName);
-        URL.revokeObjectURL(url);
-        showToast(`Descargando "${book.title}"...`);
-        return;
-      }
-
-      if (book.isDemo) {
-        const content = `BIBLIOTECA DIGITAL PARA ESTUDIANTES\n====================================\nTítulo: ${book.title}\nAutor: ${book.author}\n\nResumen:\n${book.description}\n\n(Archivo de demostración. Ingresa como desarrollador para subir tus propios PDF o EPUB).`;
-        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        triggerDownload(url, book.fileName || "ficha_libro.txt");
-        URL.revokeObjectURL(url);
-        showToast("Descargando ficha de muestra...");
-        return;
-      }
-
-      showToast("No se encontró el archivo en este navegador.");
-    }
-
-    function triggerDownload(url, filename) {
+      const downloadUrl = `${book.file_url}?download=${encodeURIComponent(book.file_name || "libro.pdf")}`;
       const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
+      a.href = downloadUrl;
+      a.download = book.file_name || "libro.pdf";
       document.body.appendChild(a);
       a.click();
       a.remove();
+      showToast(`Descargando "${book.title}"...`);
     }
 
     function updateDevUI() {
@@ -663,33 +528,45 @@
         openAddBookModal();
       } else {
         document.getElementById("devLoginError").textContent = "";
-        document.getElementById("devPasswordInput").value = "";
         document.getElementById("devLoginModal").classList.add("open");
       }
     }
 
-    function submitDevLogin(event) {
+    async function submitDevLogin(event) {
       event.preventDefault();
-      const input = document.getElementById("devPasswordInput").value;
-      if (input === DEV_PASSWORD) {
-        isDev = true;
-        sessionStorage.setItem(DEV_SESSION_KEY, "true");
-        closeModal("devLoginModal");
-        updateDevUI();
-        showToast("Sesión de desarrollador iniciada.");
-      } else {
-        document.getElementById("devLoginError").textContent = "Contraseña incorrecta.";
+      const email = document.getElementById("devEmailInput").value.trim();
+      const password = document.getElementById("devPasswordInput").value;
+      const errEl = document.getElementById("devLoginError");
+      const btn = document.getElementById("devLoginBtn");
+
+      errEl.textContent = "";
+      btn.disabled = true;
+      btn.textContent = "Verificando...";
+
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      btn.disabled = false;
+      btn.textContent = "Ingresar";
+
+      if (error) {
+        errEl.textContent = "Correo o contraseña incorrectos.";
+        return;
       }
+
+      isDev = true;
+      closeModal("devLoginModal");
+      updateDevUI();
+      showToast("Sesión de desarrollador iniciada.");
     }
 
-    function logoutDev() {
+    async function logoutDev() {
+      await sb.auth.signOut();
       isDev = false;
-      sessionStorage.removeItem(DEV_SESSION_KEY);
       updateDevUI();
       showToast("Sesión cerrada.");
     }
 
     function openAddBookModal() {
+      document.getElementById("addBookError").textContent = "";
       document.getElementById("addBookModal").classList.add("open");
     }
 
@@ -700,44 +577,88 @@
       const description = document.getElementById("newDesc").value.trim();
       const fileInput = document.getElementById("newFile");
       const coverInput = document.getElementById("newCover");
+      const errEl = document.getElementById("addBookError");
+      const btn = document.getElementById("addBookBtn");
 
       const bookFile = fileInput.files[0];
       if (!bookFile) return;
 
-      const id = "book-" + Date.now();
-      await saveFileToDB(`file_${id}`, bookFile);
+      errEl.textContent = "";
+      btn.disabled = true;
+      btn.textContent = "Subiendo archivo a la nube...";
 
-      let hasCover = false;
-      if (coverInput.files && coverInput.files[0]) {
-        await saveFileToDB(`cover_${id}`, coverInput.files[0]);
-        hasCover = true;
+      try {
+        const cleanBookName = `${Date.now()}_${sanitizeFileName(bookFile.name)}`;
+        const { error: uploadErr } = await sb.storage
+          .from("libros")
+          .upload(`archivos/${cleanBookName}`, bookFile, { upsert: false });
+
+        if (uploadErr) throw uploadErr;
+
+        const { data: pubData } = sb.storage.from("libros").getPublicUrl(`archivos/${cleanBookName}`);
+        const fileUrl = pubData.publicUrl;
+
+        let coverUrl = null;
+        if (coverInput.files && coverInput.files[0]) {
+          btn.textContent = "Subiendo portada...";
+          const coverFile = coverInput.files[0];
+          const cleanCoverName = `${Date.now()}_${sanitizeFileName(coverFile.name)}`;
+          const { error: covErr } = await sb.storage
+            .from("libros")
+            .upload(`portadas/${cleanCoverName}`, coverFile, { upsert: false });
+
+          if (covErr) throw covErr;
+          const { data: covPub } = sb.storage.from("libros").getPublicUrl(`portadas/${cleanCoverName}`);
+          coverUrl = covPub.publicUrl;
+        }
+
+        btn.textContent = "Publicando libro...";
+        const { error: dbErr } = await sb.from("books").insert({
+          title,
+          author,
+          description,
+          file_url: fileUrl,
+          file_name: bookFile.name,
+          cover_url: coverUrl
+        });
+
+        if (dbErr) throw dbErr;
+
+        event.target.reset();
+        closeModal("addBookModal");
+        await fetchBooks();
+        showToast(`"${title}" publicado para todos.`);
+      } catch (err) {
+        errEl.textContent = "Error al subir: " + (err.message || "Intenta nuevamente.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Guardar y publicar libro";
       }
-
-      books.unshift({
-        id,
-        title,
-        author,
-        description,
-        fileName: bookFile.name,
-        hasCover,
-        isDemo: false,
-        reviews: []
-      });
-
-      saveBooks();
-      event.target.reset();
-      closeModal("addBookModal");
-      renderBooks();
-      showToast(`"${title}" agregado a la biblioteca.`);
     }
 
     async function deleteBook(bookId) {
-      if (!confirm("¿Seguro que quieres eliminar este libro de la biblioteca?")) return;
-      books = books.filter(b => b.id !== bookId);
-      await deleteFileFromDB(`file_${bookId}`);
-      await deleteFileFromDB(`cover_${bookId}`);
-      saveBooks();
-      renderBooks();
+      if (!confirm("¿Seguro que quieres eliminar este libro para todos?")) return;
+
+      const book = books.find(b => b.id === bookId);
+      const { error } = await sb.from("books").delete().eq("id", bookId);
+
+      if (error) {
+        showToast("Error al eliminar: " + error.message);
+        return;
+      }
+
+      if (book) {
+        const extractPath = (url) => {
+          if (!url) return null;
+          const marker = "/object/public/libros/";
+          const idx = url.indexOf(marker);
+          return idx !== -1 ? decodeURIComponent(url.slice(idx + marker.length).split("?")[0]) : null;
+        };
+        const paths = [extractPath(book.file_url), extractPath(book.cover_url)].filter(Boolean);
+        if (paths.length > 0) await sb.storage.from("libros").remove(paths);
+      }
+
+      await fetchBooks();
       showToast("Libro eliminado.");
     }
 
@@ -751,8 +672,7 @@
       });
     });
 
-    loadBooks();
-    updateDevUI();
+    initApp();
   </script>
 </body>
 </html>
